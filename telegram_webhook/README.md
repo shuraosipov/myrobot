@@ -4,6 +4,7 @@ This CDK project is used to deploy Webhook (API Gateway + Lambda) for Telegram B
 ## Prerequisites
 1) Fill in parameters in `cdk.context.json`.
 2) Lambda layer with `requests` library. You can use `lambda-layer-requests` project to create it.
+3) Secret in AWS Secrets Manager with Telegram Bot token. Secret name should be `TELEGRAM_TOKEN`.
 
 ## Install dependencies
 ```
