@@ -1,0 +1,7 @@
+{
+    "REGION": "us-east-1",
+    "AWS_ACCOUNT_ID": "419091122511",
+    "LEX_BOT_ID": "QCLYFRRMR8",
+    "LEX_BOT_ALIAS_ID": "L0RBW3FJRI",
+    "TELEGRAM_BASE_URL": "https://api.telegram.org/bot"
+}
