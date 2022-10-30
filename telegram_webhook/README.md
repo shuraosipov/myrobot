@@ -1,5 +1,6 @@
 ## About
 This CDK project is used to deploy Webhook (API Gateway + Lambda) for Telegram Bot. 
+![Architecture](./webhook_diagram.png)
 
 ## Prerequisites
 1) Fill in parameters in `cdk.context.json`.
