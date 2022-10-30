@@ -7,7 +7,7 @@ You can interract with it via Telegram. It's written in Python, running on AWS a
 - Create a [Telegram Bot](https://core.telegram.org/bots#how-do-i-create-a-bot) and get a token
 - Save this token to AWS Secrets Manager in plaintext using `TELEGRAM_TOKEN` as its name.
 - Create an OpenAI API key
-- Create Lambda Layer with OpenAI Python and Requests libraries
+- Create a Lambda Layer with OpenAI Python and Requests libraries using this [instructions](./lambda_layer_builder/README.md)
 
 ## Deployment
 
