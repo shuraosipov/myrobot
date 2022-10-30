@@ -1,51 +1,30 @@
+## About
+This is a fulfillment function for AWS Lex intent.
+It is used to generate a response to the user based on the intent name and the slots provided by the user.
 
-# Welcome to your CDK Python project!
+## Prerequisites
+This function uses OpenAI package.
+You need to create a Lambda Layer with OpenAI Python library using this [instructions](../../lambda_layer_builder/README.md) and update `cdk.context.json` with the Layer ARN.
 
-This is a blank project for CDK development with Python.
+Also, you need to have an OpenAI API key and save this key to AWS Secrets Manager in plaintext using `OPENAI_API_KEY` as its name.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
-
-This project is set up like a standard Python project.  The initialization
-process also creates a virtualenv within this project, stored under the `.venv`
-directory.  To create the virtualenv it assumes that there is a `python3`
-(or `python` for Windows) executable in your path with access to the `venv`
-package. If for any reason the automatic creation of the virtualenv fails,
-you can create the virtualenv manually.
-
-To manually create a virtualenv on MacOS and Linux:
-
+## Install dependencies
 ```
-$ python3 -m venv .venv
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt -t .
 ```
 
-After the init process completes and the virtualenv is created, you can use the following
-step to activate your virtualenv.
-
+## Deploy
 ```
-$ source .venv/bin/activate
-```
-
-If you are a Windows platform, you would activate the virtualenv like this:
-
-```
-% .venv\Scripts\activate.bat
+cdk synth
+cdk deploy
 ```
 
-Once the virtualenv is activated, you can install the required dependencies.
-
+## Test
 ```
-$ pip install -r requirements.txt
+bash tests/test_local.sh
 ```
-
-At this point you can now synthesize the CloudFormation template for this code.
-
-```
-$ cdk synth
-```
-
-To add additional dependencies, for example other CDK libraries, just add
-them to your `setup.py` file and rerun the `pip install -r requirements.txt`
-command.
 
 ## Useful commands
 
