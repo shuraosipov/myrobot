@@ -25,7 +25,7 @@
                     }
                 },
                 "confirmationState": "None",
-                "name": "lambda_intent",
+                "name": "create_article_intent",
                 "state": "ReadyForFulfillment"
             },
             "nluConfidence": 1
@@ -72,7 +72,7 @@
                 }
             },
             "confirmationState": "None",
-            "name": "lambda_intent",
+            "name": "create_article_intent",
             "state": "ReadyForFulfillment"
         },
         "originatingRequestId": "7d8b8d23-dbd9-42c6-ad47-55d3becd9897"
@@ -96,7 +96,7 @@
             },
             "transcriptionConfidence": 1,
             "resolvedContext": {
-                "intent": "lambda_intent"
+                "intent": "create_article_intent"
             }
         }
     ],

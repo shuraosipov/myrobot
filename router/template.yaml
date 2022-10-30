@@ -17,21 +17,39 @@ Resources:
               - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
     Metadata:
       aws:cdk:path: RouterStack/lex_router_function_role/Resource
+  lexrouterfunctionroleDefaultPolicy6B25F446:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      PolicyName: lexrouterfunctionroleDefaultPolicy6B25F446
+      Roles:
+        - Ref: lexrouterfunctionrole97610A2F
+    Metadata:
+      aws:cdk:path: RouterStack/lex_router_function_role/DefaultPolicy/Resource
   lexrouterfunction81784BD6:
     Type: AWS::Lambda::Function
     Properties:
       Code:
         S3Bucket:
           Fn::Sub: cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}
-        S3Key: d19ba5ae1a901b710d65d0e426689770cd711ee17ce52f90e5914ff84b970cc5.zip
+        S3Key: bb54202f110066e8845d36471f778a91b2b50181dfa11e9af6248f3918b8103b.zip
       Role:
         Fn::GetAtt:
           - lexrouterfunctionrole97610A2F
           - Arn
       Description: Typewriter AI Router for Telegram. Used to fulfill Lex intents.
+      Environment:
+        Variables:
+          create_article_intent: typewriter_fulfullment_function
       Handler: lambda_function.lambda_handler
       Runtime: python3.9
     DependsOn:
+      - lexrouterfunctionroleDefaultPolicy6B25F446
       - lexrouterfunctionrole97610A2F
     Metadata:
       aws:cdk:path: RouterStack/lex-router-function/Resource
@@ -41,7 +59,7 @@ Resources:
   CDKMetadata:
     Type: AWS::CDK::Metadata
     Properties:
-      Analytics: v2:deflate64:H4sIAAAAAAAA/zWMQQqDMBBFz+I+TkstBZdV6LrYA8gYUzvVTMBJKCV490alq/fnf+ad4FzCMcOP5Lof84k6iA+PelSpaiOhhdi4yaj6ySsXNaHteoR4C6w9OV6Xf16UFC2KGC9wXZFuqIIeja9Q0vNWJv9APGxKIy7MetPXjnvaLfevfzk+FFDCJXsLUT4H9mQNNDt/97a3MbcAAAA=
+      Analytics: v2:deflate64:H4sIAAAAAAAA/zWNQQqDMBBFz+I+TkstpV1WoWuxB5AYUzs1mYCTUCR492qkq/f/H5h3gvMVjpn8cq76MTfYQXx6qUaxTm1EaSE2zmhRvSixdgbVvNU9LcJI2/US4iOQ8uhou/3zIrhoJbP2DPcNa4cyqFH7UrJeRBpX4YA0JIdmFyaVfJWjHvcv9ezfjg4F3OCSfRgxnwJ5tBqanT9MjCTKyAAAAA==
     Metadata:
       aws:cdk:path: RouterStack/CDKMetadata/Default
     Condition: CDKMetadataAvailable

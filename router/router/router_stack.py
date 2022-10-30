@@ -24,6 +24,14 @@ class RouterStack(Stack):
             ],
         )
 
+        router_function_role.add_to_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                actions=["lambda:InvokeFunction"],
+                resources=["*"],
+            )
+        )
+
         # create router function for lex fulfillment
         router_function = _lambda.Function(
             self,
@@ -33,6 +41,9 @@ class RouterStack(Stack):
             handler="lambda_function.lambda_handler",
             code=_lambda.Code.from_asset("lambda"),
             role=router_function_role,
+            environment={
+                "create_article_intent": "typewriter_fulfullment_function",
+            }
         )
 
         ### OUTPUTS ###
