@@ -1,0 +1,155 @@
+Resources:
+  fulfullmentfunctionServiceRoleD0BE482B:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: TypewrtierStack/fulfullment_function/ServiceRole/Resource
+  fulfullmentfunction0F965C0D:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub: cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}
+        S3Key: dc3b13555d327700a68d764d3ef907c41f306145d0ea124e592862386eba5afc.zip
+      Role:
+        Fn::GetAtt:
+          - fulfullmentfunctionServiceRoleD0BE482B
+          - Arn
+      Description: Typewriter AI function for my Robot. It uses OpenAI to generate text replies.
+      Environment:
+        Variables:
+          OPENAI_API_TOKEN:
+            Fn::Join:
+              - ""
+              - - "{{resolve:secretsmanager:arn:"
+                - Ref: AWS::Partition
+                - ":secretsmanager:"
+                - Ref: AWS::Region
+                - ":"
+                - Ref: AWS::AccountId
+                - :secret:OPENAI_API_KEY:SecretString:::}}
+      FunctionName: typewriter_fulfullment_function
+      Handler: lambda_function.lambda_handler
+      Layers:
+        - arn:aws:lambda:us-east-1:419091122511:layer:openai:1
+        - arn:aws:lambda:us-east-1:336392948345:layer:AWSSDKPandas-Python39:1
+      Runtime: python3.9
+      Timeout: 15
+    DependsOn:
+      - fulfullmentfunctionServiceRoleD0BE482B
+    Metadata:
+      aws:cdk:path: TypewrtierStack/fulfullment_function/Resource
+      aws:asset:path: /Users/shuraosipov/Documents/workspace/myrobot/fulfillment_functions/typewrtier/lambda
+      aws:asset:is-bundled: false
+      aws:asset:property: Code
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Analytics: v2:deflate64:H4sIAAAAAAAA/zWNwQqDMBBEv8V73JZaCh6r0LPYD5A1pnarbsBNKCX4742Kpzc7w+xc4JrDOcGvpLob0pFaCE+HelC1EetnbVTMmjDi1HYI4eFZO7KsyhcfelGEE4Tajma1Vy5KsgZFjBO4r4g3FF4PxhUoMd7MONQT91vpWIu6tNzR/rj6ubflUwY53JKPEKWzZ0eTgXrnHxVyG1fAAAAA
+    Metadata:
+      aws:cdk:path: TypewrtierStack/CDKMetadata/Default
+    Condition: CDKMetadataAvailable
+Conditions:
+  CDKMetadataAvailable:
+    Fn::Or:
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - af-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-northwest-1
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - sa-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-2
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-2
+Parameters:
+  BootstrapVersion:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cdk-bootstrap/hnb659fds/version
+    Description: Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]
+Rules:
+  CheckBootstrapVersion:
+    Assertions:
+      - Assert:
+          Fn::Not:
+            - Fn::Contains:
+                - - "1"
+                  - "2"
+                  - "3"
+                  - "4"
+                  - "5"
+                - Ref: BootstrapVersion
+        AssertDescription: CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.
+

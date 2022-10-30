@@ -1,0 +1,112 @@
+{
+    "sessionId": "419091122511648",
+    "inputTranscript": "2",
+    "interpretations": [
+        {
+            "intent": {
+                "slots": {
+                    "wordsnum": {
+                        "shape": "Scalar",
+                        "value": {
+                            "resolvedValues": [
+                                "2"
+                            ],
+                            "interpretedValue": "2",
+                            "originalValue": "2"
+                        }
+                    },
+                    "title": {
+                        "shape": "Scalar",
+                        "value": {
+                            "resolvedValues": [],
+                            "interpretedValue": "This is a test",
+                            "originalValue": "This is a test"
+                        }
+                    }
+                },
+                "confirmationState": "None",
+                "name": "create_article_intent",
+                "state": "ReadyForFulfillment"
+            },
+            "nluConfidence": 1
+        },
+        {
+            "intent": {
+                "slots": {},
+                "confirmationState": "None",
+                "name": "FallbackIntent",
+                "state": "ReadyForFulfillment"
+            }
+        },
+        {
+            "intent": {
+                "slots": {},
+                "confirmationState": "None",
+                "name": "welcome",
+                "state": "ReadyForFulfillment"
+            },
+            "nluConfidence": 0.52
+        }
+    ],
+    "sessionState": {
+        "sessionAttributes": {},
+        "intent": {
+            "slots": {
+                "wordsnum": {
+                    "shape": "Scalar",
+                    "value": {
+                        "resolvedValues": [
+                            "2"
+                        ],
+                        "interpretedValue": "2",
+                        "originalValue": "2"
+                    }
+                },
+                "title": {
+                    "shape": "Scalar",
+                    "value": {
+                        "resolvedValues": [],
+                        "interpretedValue": "This is a test",
+                        "originalValue": "This is a test"
+                    }
+                }
+            },
+            "confirmationState": "None",
+            "name": "create_article_intent",
+            "state": "ReadyForFulfillment"
+        },
+        "originatingRequestId": "7d8b8d23-dbd9-42c6-ad47-55d3becd9897"
+    },
+    "responseContentType": "text/plain; charset=utf-8",
+    "invocationSource": "FulfillmentCodeHook",
+    "messageVersion": "1.0",
+    "transcriptions": [
+        {
+            "transcription": "2",
+            "resolvedSlots": {
+                "wordsnum": {
+                    "shape": "Scalar",
+                    "value": {
+                        "resolvedValues": [
+                            "2"
+                        ],
+                        "originalValue": "2"
+                    }
+                }
+            },
+            "transcriptionConfidence": 1,
+            "resolvedContext": {
+                "intent": "create_article_intent"
+            }
+        }
+    ],
+    "inputMode": "Text",
+    "bot": {
+        "aliasName": "TestBotAlias",
+        "aliasId": "TSTALIASID",
+        "name": "TestBotToDelete",
+        "version": "DRAFT",
+        "localeId": "en_US",
+        "id": "TJ2QXUEKC8"
+    }
+}
