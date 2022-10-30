@@ -11,7 +11,7 @@ You can interract with it via Telegram. It's written in Python, running on AWS a
 
 ## Deployment
 
-### Deploy atelegram webhook
+### Deploy telegram webhook
 See instructions for deploying a webhook here [telegram_webhook](./telegram_webhook/README.md).
 
 Once webhook deployed, configure Telegram bot to use it, by registering webhook URL as follows:
