@@ -48,7 +48,7 @@ class TypewrtierStack(Stack):
             layers=get_layers(layer_version_arns),
             timeout=Duration.seconds(15),
             environment={
-                "OPENAI_API_TOKEN": openai_api_key.secret_value.unsafe_unwrap(),
+                "OPENAI_API_KEY": openai_api_key.secret_value.unsafe_unwrap(),
             },
         )
 

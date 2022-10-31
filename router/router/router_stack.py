@@ -1,5 +1,5 @@
 from aws_cdk import (
-    # Duration,
+    Duration,
     Stack,
     aws_lambda as _lambda,
     aws_apigateway as api_gw,
@@ -41,6 +41,7 @@ class RouterStack(Stack):
             handler="lambda_function.lambda_handler",
             code=_lambda.Code.from_asset("lambda"),
             role=router_function_role,
+            timeout=Duration.seconds(15),
             environment={
                 "create_article_intent": "typewriter_fulfullment_function",
             }

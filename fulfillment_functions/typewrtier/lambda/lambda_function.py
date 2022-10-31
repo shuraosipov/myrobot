@@ -1,5 +1,7 @@
 import os
 import json
+import openai
+
 
 def get_slots(intent_request) -> dict:
     return intent_request["sessionState"]["intent"]["slots"]
@@ -46,18 +48,23 @@ def close_action(session_id, intent_name, message):
     }
 
 
-def call_openai_api(message):
-    # This function calls the OpenAI API and returns the response
-    # It is not implemented in this example
-    return "This is the response from OpenAI"
-
 def format_message(title, openai_response):
     message = f"""#########\n\n
 Title: {title}\n\n
 {openai_response}
 """
     return message
-    
+
+
+def call_openai_api(question, max_tokens=1000, temperature=1) -> str:
+    openai.api_key = os.environ["OPENAI_API_KEY"]
+    response = openai.Completion.create(
+        engine="text-davinci-002",
+        prompt=question,
+        max_tokens=max_tokens,
+        temperature=temperature,
+    )
+    return response.choices[0].text
 
 
 def lambda_handler(event, context):
@@ -67,9 +74,8 @@ def lambda_handler(event, context):
     intent_name = intent_request["sessionState"]["intent"]["name"]
 
     title = get_slot(intent_request, "title")
-    message = format_message(title, call_openai_api(title))
-    response = close_action(session_id, intent_name, message)
+    return_message = format_message(title, call_openai_api(title))
+    response = close_action(session_id, intent_name, return_message)
 
-    # print(json.dumps(event))
     print(json.dumps(response))
     return response

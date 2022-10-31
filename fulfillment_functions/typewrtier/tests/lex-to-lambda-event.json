@@ -19,8 +19,8 @@
                         "shape": "Scalar",
                         "value": {
                             "resolvedValues": [],
-                            "interpretedValue": "This is a test",
-                            "originalValue": "This is a test"
+                            "interpretedValue": "How to make a cake?",
+                            "originalValue": "How to make a cake?"
                         }
                     }
                 },
@@ -66,8 +66,8 @@
                     "shape": "Scalar",
                     "value": {
                         "resolvedValues": [],
-                        "interpretedValue": "This is a test",
-                        "originalValue": "This is a test"
+                        "interpretedValue": "How to make a cake?",
+                        "originalValue": "How to make a cake?"
                     }
                 }
             },

@@ -1,5 +1,5 @@
 from aws_cdk import (
-    # Duration,
+    Duration,
     Environment,
     Stack,
     aws_lambda as _lambda,
@@ -67,6 +67,7 @@ class TelegramWebhookStack(Stack):
             code=_lambda.Code.from_asset("lambda"),
             role=lambda_role,
             layers=[layer],
+            timeout=Duration.seconds(15),
             environment={
                 "TELEGRAM_TOKEN": telegram_token.secret_value.unsafe_unwrap(),
                 "TELEGRAM_BASE_URL": TELEGRAM_BASE_URL,
