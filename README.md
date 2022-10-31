@@ -35,6 +35,6 @@ See instructions for deploying a Lambda Router here [router](./router/README.md)
 ## How to use
 Start a conversation with Robot by sending a message to it.
 
-<img src="images/telegram_convo_with_robot.png" width="200">
+<img src="images/telegram_chat.png" width="200">
 
 
