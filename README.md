@@ -1,4 +1,4 @@
-## About
+## About 🤖🦾🦿
 This is my digital assistant. It's called Robot.
 You can interract with Robot via Telegram messenger. It's written in Python, running on AWS and using the OpenAI API to generate answers.
 ![Architecture](./images/robot_diagram.png)
