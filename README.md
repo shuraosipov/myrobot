@@ -1,7 +1,7 @@
 ## About 🤖🦾🦿
 This is my digital assistant. It's called Robot.
 You can interract with Robot via Telegram messenger. It's written in Python, running on AWS and using the OpenAI API to generate answers.
-![Architecture](./images/robot_diagram.png)
+![Architecture](images/arch_diagram.png)
 
 ## Configuring prerequisites
 - Create a [Telegram Bot](https://core.telegram.org/bots#how-do-i-create-a-bot) and save API token to AWS Secrets Manager in plaintext using `TELEGRAM_TOKEN` as its name.
