@@ -1,0 +1,67 @@
+{
+  "vpc-provider:account=419091122511:filter.isDefault=true:region=us-east-1:returnAsymmetricSubnets=true": {
+    "vpcId": "vpc-5949a33f",
+    "vpcCidrBlock": "172.31.0.0/16",
+    "availabilityZones": [],
+    "subnetGroups": [
+      {
+        "name": "Public",
+        "type": "Public",
+        "subnets": [
+          {
+            "subnetId": "subnet-be37a7db",
+            "cidr": "172.31.64.0/20",
+            "availabilityZone": "us-east-1a",
+            "routeTableId": "rtb-30653d56"
+          },
+          {
+            "subnetId": "subnet-42b7066f",
+            "cidr": "172.31.48.0/20",
+            "availabilityZone": "us-east-1b",
+            "routeTableId": "rtb-30653d56"
+          },
+          {
+            "subnetId": "subnet-1625455f",
+            "cidr": "172.31.0.0/20",
+            "availabilityZone": "us-east-1c",
+            "routeTableId": "rtb-30653d56"
+          },
+          {
+            "subnetId": "subnet-923e94c9",
+            "cidr": "172.31.16.0/20",
+            "availabilityZone": "us-east-1d",
+            "routeTableId": "rtb-30653d56"
+          },
+          {
+            "subnetId": "subnet-3acc1c06",
+            "cidr": "172.31.32.0/20",
+            "availabilityZone": "us-east-1e",
+            "routeTableId": "rtb-30653d56"
+          },
+          {
+            "subnetId": "subnet-af1c80a3",
+            "cidr": "172.31.80.0/20",
+            "availabilityZone": "us-east-1f",
+            "routeTableId": "rtb-30653d56"
+          }
+        ]
+      },
+      {
+        "name": "Isolated",
+        "type": "Isolated",
+        "subnets": [
+          {
+            "subnetId": "subnet-0b337e83342eabb62",
+            "cidr": "172.31.100.0/24",
+            "availabilityZone": "us-east-1e",
+            "routeTableId": "rtb-0615f8653eb51f849"
+          }
+        ]
+      }
+    ]
+  },
+  "security-group:account=419091122511:region=us-east-1:securityGroupName=default:vpcId=vpc-5949a33f": {
+    "securityGroupId": "sg-be3a85c3",
+    "allowAllOutbound": false
+  }
+}
