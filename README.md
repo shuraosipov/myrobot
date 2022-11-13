@@ -2,7 +2,7 @@
 This is my digital assistant. It's called Robot.
 You can interract with Robot via Telegram messenger. It's written in Python, running on AWS and using the OpenAI API to generate answers.
 
-![Architecture](images/architecture.png)
+![Architecture](images/arch.png)
 ## Configuring prerequisites
 - Create a [Telegram Bot](https://core.telegram.org/bots#how-do-i-create-a-bot) and save API token to AWS Secrets Manager in plaintext using `TELEGRAM_TOKEN` as its name.
 - Create an OpenAI API key and save this key to AWS Secrets Manager in plaintext using `OPENAI_API_KEY` as its name.
@@ -40,6 +40,6 @@ See instructions for deploying a Lambda fullfilment functions here [typewriter f
 ## How to use
 Start a conversation with Robot by sending a message to it.
 
-<img src="images/telegram_chat.png" width="200">
+<img src="images/bot_lex.gif">
 
 
