@@ -1,0 +1,16 @@
+import os
+
+# Telegram bot token
+TELEGRAM_TOKEN = os.environ["TELEGRAM_TOKEN"]
+
+# Cognito
+CLIENT_ID = os.environ["CLIENT_ID"]
+CLIENT_SECRET = os.environ["CLIENT_SECRET"]
+REDIRECT_URI = os.environ["REDIRECT_URI"]
+AUTHORIZATION_SERVER_URL = os.environ["AUTHORIZATION_SERVER_URL"]
+TOKEN_ENDPOINT = AUTHORIZATION_SERVER_URL + "/oauth2/token"
+LOGIN_ENDPOINT = AUTHORIZATION_SERVER_URL + "/login"
+
+# Lex
+LEX_BOT_ID = os.environ["LEX_BOT_ID"]
+LEX_BOT_ALIAS = os.environ["LEX_BOT_ALIAS"]

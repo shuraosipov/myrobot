@@ -2,8 +2,9 @@
 This is a simple Telegram bot that can be hosted on a server. It is written in Python and uses the [python-telegram-bot]
 
 ## Test locally
+Assuming you have AWS credentials configured, you can test the bot locally by running the following command:
 ```
-docker build --platform=linux/amd64 -t telegram_bot . && docker run --env-file env.list telegram_bot
+docker build --platform=linux/amd64 -t telegram_bot . && docker run -v $HOME/.aws:/home/.aws --env-file env.list telegram_bot
 ```
 
 ## Build and Push to ECR
