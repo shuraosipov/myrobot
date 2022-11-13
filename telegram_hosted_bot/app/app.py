@@ -4,6 +4,9 @@ import functools
 import requests
 import base64
 import jwt
+import boto3
+import string
+import secrets
 
 from telegram import Update
 from telegram.ext import (
@@ -22,6 +25,13 @@ REDIRECT_URI = os.environ["REDIRECT_URI"]
 AUTHORIZATION_SERVER_URL = os.environ["AUTHORIZATION_SERVER_URL"]
 TOKEN_ENDPOINT = AUTHORIZATION_SERVER_URL + "/oauth2/token"
 LOGIN_ENDPOINT = AUTHORIZATION_SERVER_URL + "/login"
+LEX_BOT_ID = os.environ["LEX_BOT_ID"]
+LEX_BOT_ALIAS = os.environ["LEX_BOT_ALIAS"]
+AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
+AWS_SECRET_ACCESS_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
+
+# reuse client connection as global
+lex = boto3.client('lexv2-runtime', region_name='us-east-1')
 
 
 def base64_encode(string) -> str:
@@ -81,15 +91,14 @@ def oauth_check_user_authentication(update: Update, context: CallbackContext):
     """
     try:
         auth_code = context.args[0]
+        
     except IndexError:
         logging.info("No auth code found in context.args")
         return False
 
     context.user_data["auth_code"] = auth_code
-       
     first_name, last_name, email = oauth_get_user_info(auth_code)
     text = f"🔐 You are logged in as {first_name} {last_name} ({email}).\n\n"
-
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 
@@ -145,13 +154,65 @@ def caps(update: Update, context: CallbackContext):
     text_caps = " ".join(context.args).upper()
     context.bot.send_message(chat_id=update.effective_chat.id, text=text_caps)
 
+def passwd(update: Update, context: CallbackContext):
+    text = generate_password()
+    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
 
 def unknown(update: Update, context: CallbackContext):
     context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="Sorry, I didn't understand that command.",
-    )
+        text="Sorry, I didn't understand that command.",)
 
+
+# lex commands
+def send_message_to_lex(message, bot_id, bot_alias_id, locale_id='en_US') -> dict:
+    logging.info(f"Sending message to Lex: {message}")
+    response = lex.recognize_text(
+        botId=bot_id,
+        botAliasId=bot_alias_id,
+        sessionId='123456',
+        text=message,
+        localeId=locale_id
+    )
+    return response
+
+def format_lex_response(lex_response):
+    for message in lex_response["messages"]:
+        if message["contentType"] == "PlainText":
+            return message["content"]
+
+def send_lex_reply_to_telegram(update: Update, context: CallbackContext, lex_response) -> None:
+    for lex_message in lex_response["messages"]:
+        if lex_message["contentType"] == "PlainText":
+            context.bot.send_message(chat_id=update.effective_chat.id, text=lex_message["content"])
+
+
+@check_auth_or_ask_for_login
+def call_lex(update: Update, context: CallbackContext) -> None:
+
+    if len(context.args) == 0:
+        utterance = 'call lambda'
+    else:
+        utterance = " ".join(context.args)
+    
+    lex_response = send_message_to_lex(utterance, LEX_BOT_ID, LEX_BOT_ALIAS)
+    send_lex_reply_to_telegram(update, context, lex_response)
+    
+
+# a function that generates storng password
+def generate_password() -> str:
+    """ Generate a ten-character alphanumeric password with at least one lowercase character, 
+    at least one uppercase character, and at least three digits 
+    """
+    alphabet = string.ascii_letters + string.digits + string.punctuation
+    while True:
+        password = ''.join(secrets.choice(alphabet) for i in range(10))
+        if (any(c.islower() for c in password)
+                and any(c.isupper() for c in password)
+                and sum(c.isdigit() for c in password) >= 3):
+            break
+    return password
 
 if __name__ == "__main__":
 
@@ -159,22 +220,30 @@ if __name__ == "__main__":
     dispatcher = updater.dispatcher
 
     logging.basicConfig(
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        format="%(asctime)s - %(name)s - %(levelname)s - %(funcName)s - %(message)s",
         level=logging.INFO,
     )
 
     logger = logging.getLogger(__name__)
 
+    # command accessible without authentication
     start_handler = CommandHandler("start", start)
     echo_handler = MessageHandler(Filters.text & (~Filters.command), echo)
-    caps_handler = CommandHandler("caps", caps)
-    unknown_handler = MessageHandler(Filters.command, unknown)
+    passwd_handler = CommandHandler("generate_password", passwd)
+    
     login_handler = CommandHandler("login", login)
+
+    # auth required commands
+    caps_handler = CommandHandler("caps", caps)
+    lex_handler = CommandHandler("lex", call_lex)
+    unknown_handler = MessageHandler(Filters.command, unknown)
 
     dispatcher.add_handler(login_handler)
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(echo_handler)
     dispatcher.add_handler(caps_handler)
+    dispatcher.add_handler(lex_handler)
+    dispatcher.add_handler(passwd_handler)
     dispatcher.add_handler(unknown_handler)
 
     updater.start_polling()
