@@ -74,7 +74,8 @@ def lambda_handler(event, context):
     intent_name = intent_request["sessionState"]["intent"]["name"]
 
     title = get_slot(intent_request, "title")
-    return_message = format_message(title, call_openai_api(title))
+    #return_message = format_message(title, call_openai_api(title))
+    return_message = call_openai_api(title)
     response = close_action(session_id, intent_name, return_message)
 
     print(json.dumps(response))
