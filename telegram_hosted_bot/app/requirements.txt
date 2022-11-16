@@ -2,3 +2,4 @@ python-telegram-bot
 requests
 pyjwt[crypto]
 boto3
+requests-oauthlib
