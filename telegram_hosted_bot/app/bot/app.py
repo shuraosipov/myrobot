@@ -5,7 +5,7 @@ from telegram.ext import Updater,CallbackContext,CommandHandler,MessageHandler,F
 
 from const import TELEGRAM_TOKEN
 from auth import oauth_check_user_authentication, check_auth_or_ask_for_login, login
-from commands import call_lex, passwd, echo, caps
+from commands import call_lex, passwd, echo, caps, calendar
 
 
 ### Handlers for default commands
@@ -28,7 +28,6 @@ def unknown(update: Update, context: CallbackContext):
 def lex(update: Update, context: CallbackContext):
     call_lex(update, context)
 
-
 if __name__ == "__main__":
 
     updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
@@ -47,9 +46,12 @@ if __name__ == "__main__":
     passwd_handler = CommandHandler("pass", passwd)
     login_handler = CommandHandler("login", login)
     caps_handler = CommandHandler("caps", caps)
+    
 
     # commands that require authentication
     lex_handler = CommandHandler("lex", lex)
+    calendar_handler = CommandHandler("calendar", calendar)
+
     unknown_handler = MessageHandler(Filters.command, unknown)
 
     dispatcher.add_handler(login_handler)
@@ -58,6 +60,7 @@ if __name__ == "__main__":
     dispatcher.add_handler(caps_handler)
     dispatcher.add_handler(lex_handler)
     dispatcher.add_handler(passwd_handler)
+    dispatcher.add_handler(calendar_handler)
     dispatcher.add_handler(unknown_handler)
 
     updater.start_polling()
