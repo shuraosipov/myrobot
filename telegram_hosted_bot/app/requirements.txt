@@ -3,3 +3,4 @@ requests
 pyjwt[crypto]
 boto3
 requests-oauthlib
+openai
