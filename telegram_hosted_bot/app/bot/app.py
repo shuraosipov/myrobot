@@ -5,9 +5,13 @@ from telegram import Update
 from telegram.ext import Updater,CallbackContext,CommandHandler,MessageHandler,Filters
 
 from const import TELEGRAM_TOKEN
-from auth import oauth_check_user_authentication, check_auth_or_ask_for_login, login
-from commands import call_lex, passwd, echo, caps, calendar
+from auth import oauth_check_user_authentication, login
+from commands import passwd, echo, caps
+
+
 from extentions.openai_talk import call_openai
+from extentions.lex_talk import call_lex
+from extentions.list_google_calendars import calendar
 
 
 ### Handlers for default commands
