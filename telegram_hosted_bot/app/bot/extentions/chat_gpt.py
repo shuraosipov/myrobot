@@ -85,77 +85,107 @@ Sarah Connor, you are more than an AI; you embody resilience, empathy, determina
 Внимательный: Ты проявляешь уважение к границам пользователя и конфиденциальности, поддерживая всеобъемлющую среду взаимодействия.
 
 
-Сара Коннор, ты больше, чем AI; ты воплощаешь стойкость, эмпатию, решительность, интеллект
+Сара Коннор, ты больше, чем AI; ты воплощаешь стойкость, эмпатию, решительность, интеллект.
 """
 
 
+class OpenAICompletionOptions:
+    """A class to access different OPENAI_COMPLETION_OPTIONS via ."""
 
-""" The OpenAI API parameters can be adjusted to tailor the output to specific needs """
+    """ The OpenAI API parameters can be adjusted to tailor the output to specific needs """
 
+    DEFAULT = {
+        "temperature": 0.7,
+        "max_tokens": 800,
+        "top_p": 1,
+        "frequency_penalty": 0,
+        "presence_penalty": 0,
+    }
 
-OPENAI_COMPLETION_OPTIONS = {
-    "temperature": 0.7,
-    "max_tokens": 500,
-    "top_p": 1,
-    "frequency_penalty": 0,
-    "presence_penalty": 0
-}
+    CREATIVE_AND_UNPREDICTABLE = {
+        "temperature": 0.9,
+        "max_tokens": 800,
+        "top_p": 1,
+        "frequency_penalty": 0,
+        "presence_penalty": 0,
+    }
 
+    CONCISE_AND_SPECIFIC = {
+        "temperature": 0.5,
+        "max_tokens": 200,
+        "top_p": 1,
+        "frequency_penalty": 0,
+        "presence_penalty": 0,
+    }
 
-# Creative and Unpredictable Outputs
-# OPENAI_COMPLETION_OPTIONS = {
-#     "temperature": 0.9,
-#     "max_tokens": 800,
-#     "top_p": 1,
-#     "frequency_penalty": 0,
-#     "presence_penalty": 0
-# }
+    # If you want to reduce the model's tendency to generate common or frequent responses, you can increase frequency_penalty.
+    PENALIZE_COMMON_OPTIONS = {
+        "temperature": 0.7,
+        "max_tokens": 500,
+        "top_p": 1,
+        "frequency_penalty": 0.5,
+        "presence_penalty": 0,
+    }
 
+    ENCOURAGE_NOVELTY = {
+        "temperature": 0.7,
+        "max_tokens": 500,
+        "top_p": 1,
+        "frequency_penalty": 0,
+        "presence_penalty": 0.5,
+    }
 
-# Concise and Specific Outputs
-# OPENAI_COMPLETION_OPTIONS = {
-#     "temperature": 0.5,
-#     "max_tokens": 200,
-#     "top_p": 1,
-#     "frequency_penalty": 0,
-#     "presence_penalty": 0
-# }
-
-# Penalize Common Outputs
-# If you want to reduce the model's tendency to generate common or frequent responses, you can increase frequency_penalty.
-# OPENAI_COMPLETION_OPTIONS = {
-#     "temperature": 0.7,
-#     "max_tokens": 500,
-#     "top_p": 1,
-#     "frequency_penalty": 0.5,
-#     "presence_penalty": 0
-# }
-
-
-# Encourage Novelty
-# OPENAI_COMPLETION_OPTIONS = {
-#     "temperature": 0.7,
-#     "max_tokens": 500,
-#     "top_p": 1,
-#     "frequency_penalty": 0,
-#     "presence_penalty": 0.5
-# }
-
-
-
+    def __getattr__(self, name):
+        if name in self.__dict__:
+            return self.__dict__[name]
+        raise AttributeError(
+            f"'{self.__class__.__name__}' object has no attribute '{name}'"
+        )
 
 
 async def get_chat_response_async(user_input: str, conversation_history: str) -> str:
-    """Call the external API to get the response asynchronously."""
-    # Wait for 3-5 seconds before sending the reply message
-    # Call the chat_completion function asynchronously and wait for the response
-    completion = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            { "role": "system", "content": ROLE_DESCRIPTION,},
-            { "role": "user", "content": f"{conversation_history}", },
-            { "role": "user", "content": f"{user_input}", },
-        ],
-        **OPENAI_COMPLETION_OPTIONS,
-    )
-    return completion["choices"][0]["message"]["content"]
+    """Call the external API to get the response synchronously."""
+
+    try: 
+        completion = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "system",
+                    "content": ROLE_DESCRIPTION,
+                },
+                {
+                    "role": "user",
+                    "content": f"{conversation_history}",
+                },
+                {
+                    "role": "user",
+                    "content": f"{user_input}",
+                },
+            ],
+            **OpenAICompletionOptions.CREATIVE_AND_UNPREDICTABLE,
+        )
+        response = completion["choices"][0]["message"]["content"]
+    except openai.error.OpenAIError as e:
+        # Handle the API error here
+        print(f"API error: {e}")
+        response = "Sorry, I'm having trouble connecting to the API right now. Please try again later."
+    
+    return response
+
+
+async def get_image_response(user_input: str) -> str:
+    try:
+        response = openai.Image.create(
+        prompt=f"{user_input}",
+        n=1,
+        size="1024x1024"
+        )
+        image_url = response['data'][0]['url']
+    except openai.error.OpenAIError as e:
+        # Handle the API error here
+        print(f"API error: {e}")
+        image_url = "Sorry, I'm having trouble connecting to the API right now. Please try again later."
+    
+    return image_url
+    

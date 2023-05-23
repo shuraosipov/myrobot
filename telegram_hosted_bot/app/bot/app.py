@@ -21,20 +21,25 @@ if __version_info__ < (20, 0, 0, "alpha", 1):
         f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html"
     )
 from telegram import ForceReply, Update
-from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
-from telegram.constants import ChatAction
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    filters,
+)
+from telegram.constants import ChatAction, ParseMode
 
 from const import TELEGRAM_TOKEN
 from auth import oauth_check_user_authentication, login
-from commands import passwd, echo, caps
+from commands import passwd, caps
 
 
 from extentions.openai_talk import call_openai
 from extentions.lex_talk import call_lex
 from extentions.list_google_calendars import calendar
-from extentions.chat_gpt import get_chat_response_async
-
-
+from extentions.chat_gpt import get_chat_response_async, get_image_response
 
 # Enable logging
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
@@ -44,53 +49,120 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 logger.setLevel(LOGLEVEL)
 
+
 async def online(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Test that the bot is online, up and running."""
 
     # add a typing action to show the bot is doing something
-    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+    await context.bot.send_chat_action(
+        chat_id=update.effective_chat.id, action=ChatAction.TYPING
+    )
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="I'm online and ready to chat!")
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, text="I'm online and ready to chat!"
+    )
+
 
 # Define a command handlers.
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!")
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!"
+    )
+
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     await update.message.reply_text(update.message.text)
 
-async def ai(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
-    """Get the user message."""
+async def ai(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Call the OpenAI API Completion endpoint to simulate human-like conversation."""
+
+    # Get the user message
     message = update.message
 
     # Get the chat id
     chat_id = update.message.chat_id
+
+    # Send the "thinking" message
+    thinking_message = await send_thinking_message_async(message)
 
     # Get the conversation history for this chat
     conversation_history = context.chat_data.get(chat_id, deque([], maxlen=15))
 
     # Add the new message to the conversation history
     conversation_history.append(update.message.text)
-
-    # Send the initial "thinking" message immediately
-
-    thinking_emojis = ["🤔", "💭", "🧐"]
-    thinking_message = await message.reply_text(text=random.choice(thinking_emojis), reply_to_message_id=message.message_id)
-    
+    # print(conversation_history)
 
     # Call the chat_completion function
-
-    print(conversation_history)
-
     response = await get_chat_response_async(message.text, conversation_history)
-    
-    # After a delay of 1-2 seconds, update the "thinking" message with the chatbot's response
+
+    # Replace the "thinking" message with the chatbot's response
     await thinking_message.edit_text(text=response)
-    
+
     # Store the updated conversation history in the context
-    context.chat_data[chat_id] = conversation_history 
+    context.chat_data[chat_id] = conversation_history
+
+
+async def imagine(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Call the OpenAI API Image endpoint to generate an image from a given prompt."""
+
+    # Get the user message
+    message = update.message
+
+    # Send the "thinking" message
+    thinking_message = await send_thinking_message_async(message)
+
+    # Get image url from openai
+    response = await get_image_response(message.text)
+
+    text = f"<a href=\"{response}\">Open image in Browser</a>"
+
+    # Change the "thinking" message with the chatbot's response
+    await thinking_message.edit_text(text=text, parse_mode=ParseMode.HTML)
+
+
+""" Utility functions for bot responses to make them more human-like """
+
+
+async def send_thinking_message_async(message):
+    """Send a "thinking" message to the chat."""
+    # Define a list of thinking emojis
+    thinking_emojis = ["🤔", "💭", "😶‍🌫️"]
+
+    # Choose a random thinking emoji
+    thinking_emoji = random.choice(thinking_emojis)
+
+    # Prepare the text with HTML formatting
+    text = f"<b>On it, one moment...</b> {thinking_emoji}"
+
+    # Send the thinking message to the chat
+    thinking_message = await message.reply_text(
+        text=text, reply_to_message_id=message.message_id, parse_mode=ParseMode.HTML
+    )
+
+    # Return the thinking message object
+    return thinking_message
+
+
+# an example of reply using sticker
+# async def send_thinking_message_async(message):
+#     """Send a "thinking" message to the chat."""
+#     # Define a list of thinking stickers
+#     thinking_stickers = ["CAACAgIAAxkBAAEhkVdkbN9OBb4Bz1jHo7LncM4gAzuYHwACkhgAAmi5OUnF93JLwz5cVC8E"]
+
+#     # Choose a random thinking sticker
+#     thinking_sticker = random.choice(thinking_stickers)
+
+#     # Send the thinking sticker to the chat
+#     thinking_message = await message.reply_sticker(
+#         sticker=thinking_sticker,
+#         reply_to_message_id=message.message_id
+#     )
+
+#     # Return the thinking message object
+#     return thinking_message
+
 
 def main() -> None:
     """Start the bot."""
@@ -109,7 +181,10 @@ def main() -> None:
     application.add_handler(CommandHandler("online", online))
 
     # define a command handler with multiple aliases
-    application.add_handler(CommandHandler(["ai", "sarah", "imagine"], ai))
+    application.add_handler(CommandHandler(["ai", "sarah"], ai))
+
+    # generate image from text
+    application.add_handler(CommandHandler("imagine", imagine))
 
     # on non command i.e message - echo the message on Telegram
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
@@ -117,6 +192,6 @@ def main() -> None:
     # Run the bot until the user presses Ctrl-C
     application.run_polling()
 
-if __name__ == '__main__':
 
+if __name__ == "__main__":
     main()
