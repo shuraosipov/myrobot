@@ -13,7 +13,7 @@ from telegram.ext import (
     CallbackContext,
     CommandHandler,
     MessageHandler,
-    Filters,
+    filters,
 )
 
 from requests_oauthlib import OAuth2Session

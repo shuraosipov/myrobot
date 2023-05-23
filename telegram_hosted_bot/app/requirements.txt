@@ -4,3 +4,5 @@ pyjwt[crypto]
 boto3
 requests-oauthlib
 openai
+python-dotenv
+aiohttp
