@@ -20,7 +20,7 @@ if __version_info__ < (20, 0, 0, "alpha", 1):
         f"{TG_VER} version of this example, "
         f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html"
     )
-from telegram import ForceReply, Update
+from telegram import ForceReply, Update, BotCommand
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
@@ -41,7 +41,7 @@ from extentions.lex_talk import call_lex
 from extentions.list_google_calendars import calendar
 from extentions.chat_gpt import get_chat_response_async, get_image_response
 
-# Enable logging
+### Enable logging.
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -49,6 +49,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 logger.setLevel(LOGLEVEL)
 
+### Define a command handlers.
 
 async def online(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Test that the bot is online, up and running."""
@@ -62,8 +63,31 @@ async def online(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id=update.effective_chat.id, text="I'm online and ready to chat!"
     )
 
+async def hi(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Test that the bot is online, up and running."""
 
-# Define a command handlers.
+    # add a typing action to show the bot is doing something
+    await context.bot.send_chat_action(
+        chat_id=update.effective_chat.id, action=ChatAction.TYPING
+    )
+
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, text="Hey! I'm online and ready to chat!"
+    )
+
+    # jinxpowder stickers ;)
+    stickers = [
+        "CAACAgIAAxkBAAIKLGRuiw0frKVyGY47-NPoNh_7xWzLAAKTGwACVoFBSYxpB21uy7wjLwQ", 
+        "CAACAgIAAxkBAAEhkVdkbN9OBb4Bz1jHo7LncM4gAzuYHwACkhgAAmi5OUnF93JLwz5cVC8E",
+        "CAACAgIAAxkBAAIKMGRui4GNZn3S5Fb4sAkhx3pLN90wAAI4GQACe19ASY731Aqr2LJMLwQ"
+    ]
+
+    await context.bot.send_sticker(
+        chat_id=update.effective_chat.id, sticker=random.choice(stickers),
+    )
+
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!"
@@ -77,6 +101,11 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def ai(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Call the OpenAI API Completion endpoint to simulate human-like conversation."""
+
+    # [Visual effects] - add a typing action to show the bot is doing something
+    await context.bot.send_chat_action(
+        chat_id=update.effective_chat.id, action=ChatAction.TYPING
+    )
 
     # Get the user message
     message = update.message
@@ -145,24 +174,20 @@ async def send_thinking_message_async(message):
     return thinking_message
 
 
-# an example of reply using sticker
-# async def send_thinking_message_async(message):
-#     """Send a "thinking" message to the chat."""
-#     # Define a list of thinking stickers
-#     thinking_stickers = ["CAACAgIAAxkBAAEhkVdkbN9OBb4Bz1jHo7LncM4gAzuYHwACkhgAAmi5OUnF93JLwz5cVC8E"]
 
-#     # Choose a random thinking sticker
-#     thinking_sticker = random.choice(thinking_stickers)
+async def print_sticker_details(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Print the details of a sticker pasted to the chat."""
+    message = update.message
+    sticker = message.sticker
 
-#     # Send the thinking sticker to the chat
-#     thinking_message = await message.reply_sticker(
-#         sticker=thinking_sticker,
-#         reply_to_message_id=message.message_id
-#     )
+    # Print the sticker details
+    print(f"Sticker ID: {sticker.file_id}")
+    print(f"Sticker Set Name: {sticker.set_name}")
+    print(f"Sticker Emoji: {sticker.emoji}")
+    print(f"Sticker File Size: {sticker.file_size} bytes")
 
-#     # Return the thinking message object
-#     return thinking_message
 
+    
 
 def main() -> None:
     """Start the bot."""
@@ -177,6 +202,9 @@ def main() -> None:
     # on different commands - answer in Telegram
     application.add_handler(CommandHandler("start", start))
 
+    # say hi
+    application.add_handler(CommandHandler("hi", hi))
+
     # check online status
     application.add_handler(CommandHandler("online", online))
 
@@ -188,6 +216,10 @@ def main() -> None:
 
     # on non command i.e message - echo the message on Telegram
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+
+
+    # print sticker details to the console
+    # application.add_handler(MessageHandler(filters.Sticker.ALL, print_sticker_details))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling()

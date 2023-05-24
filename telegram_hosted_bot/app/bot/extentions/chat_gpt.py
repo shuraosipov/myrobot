@@ -144,7 +144,7 @@ class OpenAICompletionOptions:
 
 
 async def get_chat_response_async(user_input: str, conversation_history: str) -> str:
-    """Call the external API to get the response synchronously."""
+    """Call the OpenAI API Completion endpoint to get the response synchronously."""
 
     try: 
         completion = openai.ChatCompletion.create(
