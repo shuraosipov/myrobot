@@ -10,34 +10,25 @@ from extentions.chat_gpt import get_chat_response_async
 
 
 async def handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Call the OpenAI API Completion endpoint to simulate human-like conversation."""
+    """
+    Handle the '/ai' command by simulating a human-like conversation using OpenAI's GPT-X model.
+    """
 
-    # [Visual effects] - add a typing action to show the bot is doing something
-    await context.bot.send_chat_action(
-        chat_id=update.effective_chat.id, action=ChatAction.TYPING
-    )
-
-    # Get the user message
-    message = update.message
-
-    # Get the chat id
-    chat_id = update.message.chat_id
-
-    # Send the "thinking" message
-    thinking_message = await send_thinking_message_async(message)
+    # Inform the user that the bot is processing their message
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id,action=ChatAction.TYPING)
+    thinking_message = await send_thinking_message_async(update.message)
 
     # Get the conversation history for this chat
-    conversation_history = context.chat_data.get(chat_id, deque([], maxlen=15))
-
+    conversation_history = context.chat_data.get(update.message.chat_id, deque([], maxlen=15))
+    
     # Add the new message to the conversation history
     conversation_history.append(update.message.text)
-    # print(conversation_history)
 
-    # Call the chat_completion function
-    response = await get_chat_response_async(message.text, conversation_history)
+    # Generate a thoughtful response using the conversation history
+    response = await get_chat_response_async(update.message.text, conversation_history)
 
-    # Replace the "thinking" message with the chatbot's response
+    # Respond to the user by editing the thinking message
     await thinking_message.edit_text(text=response)
 
-    # Store the updated conversation history in the context
-    context.chat_data[chat_id] = conversation_history
+    # Store the updated conversation history
+    context.chat_data[update.message.chat_id] = conversation_history
