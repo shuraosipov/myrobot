@@ -1,11 +1,10 @@
-import json
 import os
 import logging
 import asyncio
-import random
+from collections import deque
 from dotenv import load_dotenv
 import openai
-import aiohttp
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -84,55 +83,82 @@ class OpenAICompletionOptions:
         )
 
 
-async def get_chat_response_async(user_input: str, conversation_history: str) -> str:
+async def get_chat_response_async(user_input: str, conversation_history: deque) -> str:
     """Call the OpenAI API Completion endpoint to get the response synchronously."""
 
-    try: 
-        completion = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {
-                    "role": "system",
-                    "content": ROLE_DESCRIPTION,
-                },
-                {
-                    "role": "user",
-                    "content": f"{conversation_history}",
-                },
-                {
-                    "role": "user",
-                    "content": f"{user_input}",
-                },
-            ],
-            **OpenAICompletionOptions.CREATIVE_AND_UNPREDICTABLE,
+    # Input validation
+    if not isinstance(user_input, str) or not isinstance(conversation_history, deque):
+        raise ValueError(
+            "user_input must be string and conversation_history must be deque."
         )
 
-        print(completion)
-        model = completion["model"]
-        completion_tokens, prompt_tokens, total_tokens = completion["usage"]["completion_tokens"], completion["usage"]["prompt_tokens"], completion["usage"]["total_tokens"]
-        logging.info(f"Model: {model}, Completion tokens: {completion_tokens}, Prompt tokens: {prompt_tokens}, Total tokens: {total_tokens}")
+    response = ""
+    retries = 0
+    while retries < 3:  # Retry up to 3 times
+        try:
+            completion = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": ROLE_DESCRIPTION,
+                    },
+                    {
+                        "role": "user",
+                        "content": f"{conversation_history}",
+                    },
+                    {
+                        "role": "user",
+                        "content": f"{user_input}",
+                    },
+                ],
+                **OpenAICompletionOptions.CREATIVE_AND_UNPREDICTABLE,
+            )
+            # If successful, break out of the retry loop
+            break
+        except openai.error.OpenAIError as e:
+            # Handle the API error here
+            logging.error(f"API error: {e}")
+            response = "Sorry, I'm having trouble connecting to the API right now. Please try again later."
+            retries += 1
+            await asyncio.sleep(2)  # Wait for 2 seconds before retrying
+            continue
+        except KeyError as e:
+            # Handlethe KeyError here
+            logging.error(f"KeyError: {e}")
+            response = "Sorry, there seems to be an error in processing your request. Please try again later."
+            break
+        except Exception as e:
+            # Handle other generic exceptions here
+            logging.error(f"Unexpected error: {e}")
+            response = "Sorry, something went wrong. Please try again later."
+            break
 
-        response = completion["choices"][0]["message"]["content"]
-    except openai.error.OpenAIError as e:
-        # Handle the API error here
-        print(f"API error: {e}")
-        response = "Sorry, I'm having trouble connecting to the API right now. Please try again later."
-    
+    if retries == 3:
+        return "Sorry, the API is currently not responding. Please try again later."
+
+    # If no exception was raised, process the completion
+    completion_tokens, prompt_tokens, total_tokens = (
+        completion["usage"]["completion_tokens"],
+        completion["usage"]["prompt_tokens"],
+        completion["usage"]["total_tokens"],
+    )
+
+    model = completion["model"]
+    logging.info(f"Model: {model}, Completion tokens: {completion_tokens}, Prompt tokens: {prompt_tokens}, Total tokens: {total_tokens}")
+
+    response = completion["choices"][0]["message"]["content"]
+
     return response
 
 
-async def get_image_response(user_input: str) -> str:
+def get_image_response(user_input: str) -> str:
     try:
-        response = openai.Image.create(
-        prompt=f"{user_input}",
-        n=1,
-        size="1024x1024"
-        )
-        image_url = response['data'][0]['url']
+        response = openai.Image.create(prompt=f"{user_input}", n=1, size="1024x1024")
+        image_url = response["data"][0]["url"]
     except openai.error.OpenAIError as e:
         # Handle the API error here
-        print(f"API error: {e}")
+        logging.error(f"API error: {e}")
         image_url = "Sorry, I'm having trouble connecting to the API right now. Please try again later."
-    
+
     return image_url
-    
