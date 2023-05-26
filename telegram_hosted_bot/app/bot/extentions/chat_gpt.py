@@ -152,7 +152,7 @@ async def get_chat_response_async(user_input: str, conversation_history: deque) 
     return response
 
 
-def get_image_response(user_input: str) -> str:
+async def get_image_response(user_input: str) -> str:
     try:
         response = openai.Image.create(prompt=f"{user_input}", n=1, size="1024x1024")
         image_url = response["data"][0]["url"]
