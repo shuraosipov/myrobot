@@ -6,3 +6,4 @@ requests-oauthlib
 openai
 python-dotenv
 aiohttp
+pydub

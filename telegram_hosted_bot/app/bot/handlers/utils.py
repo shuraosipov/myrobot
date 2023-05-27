@@ -2,6 +2,8 @@ import random
 from telegram import Update, Message
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
+from datetime import datetime
+import uuid
 
 async def send_thinking_message_async(message) -> Message:
     """Send a "thinking" message to the chat."""
@@ -37,15 +39,9 @@ async def print_sticker_details(update: Update, context: ContextTypes.DEFAULT_TY
     print(f"Sticker File Size: {sticker.file_size} bytes")
 
 
-async def handle_voice_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle a voice message by replying with a voice message."""
-    message = update.message
-    voice = message.voice
 
-    # Get the voice file ID
-    voice_file_id = voice.file_id
 
-    # Reply with a voice message
-    #message.reply_voice(voice=voice_file_id)
-    print("voice message received")
-    print(voice_file_id)
+
+    
+    
+    

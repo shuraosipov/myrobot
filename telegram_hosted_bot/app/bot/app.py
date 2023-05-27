@@ -8,8 +8,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
 # Application-specific imports
 from const import TELEGRAM_TOKEN
-from handlers import ai, echo, hi, imagine, online, start
-from handlers.utils import handle_voice_message
+from handlers import ai, echo, hi, imagine, online, start, voice
 
 # Version check
 try:
@@ -35,6 +34,7 @@ logger.setLevel(LOGLEVEL)
 
 def main() -> None:
     """Start the bot."""
+    
     # Create the Application and pass it your bot's token.
     application = Application.builder().token(TELEGRAM_TOKEN).build()
 
@@ -53,12 +53,11 @@ def main() -> None:
         application.add_handler(CommandHandler(command, handler))
 
     # Add message handlers
-
     # on non command i.e message - echo the message on Telegram
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo.handler))
+    # application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo.handler))
 
     # handling voice messages
-    application.add_handler(MessageHandler(filters.VOICE, handle_voice_message))
+    application.add_handler(MessageHandler(filters.VOICE, voice.handler))
 
     # print sticker details to the console
     # application.add_handler(MessageHandler(filters.Sticker.ALL, print_sticker_details))
