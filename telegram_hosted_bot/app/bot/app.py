@@ -8,7 +8,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
 # Application-specific imports
 from const import TELEGRAM_TOKEN
-from handlers import ai, echo, hi, imagine, online, start, voice
+from handlers import ai, echo, hi, imagine, online, start, voice, help
 
 # Version check
 try:
@@ -34,13 +34,14 @@ logger.setLevel(LOGLEVEL)
 
 def main() -> None:
     """Start the bot."""
-    
+
     # Create the Application and pass it your bot's token.
     application = Application.builder().token(TELEGRAM_TOKEN).build()
 
     # Define command mappings
     commands = {
         "start": start.handler,
+        "help": help.handler,
         "hi": hi.handler,
         "online": online.handler,
         "ai": ai.handler,
