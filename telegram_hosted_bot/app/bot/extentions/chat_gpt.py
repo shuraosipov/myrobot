@@ -92,6 +92,9 @@ async def get_chat_response_async(user_input: str, conversation_history: deque) 
             "user_input must be string and conversation_history must be deque."
         )
 
+     # Generate a list of messages from the conversation history
+    history_messages = list(conversation_history)
+
     response = ""
     retries = 0
     while retries < 3:  # Retry up to 3 times
@@ -103,10 +106,7 @@ async def get_chat_response_async(user_input: str, conversation_history: deque) 
                         "role": "system",
                         "content": ROLE_DESCRIPTION,
                     },
-                    {
-                        "role": "user",
-                        "content": f"{conversation_history}",
-                    },
+                    *history_messages,
                     {
                         "role": "user",
                         "content": f"{user_input}",
