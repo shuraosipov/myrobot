@@ -1,14 +1,20 @@
 # Standard library imports
 import logging
 import os
+import importlib
+import json
+
 
 # Third party imports
+from dotenv import load_dotenv
 from telegram import __version__ as TG_VER
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
-# Application-specific imports
-from const import TELEGRAM_TOKEN
-from handlers import ai, echo, hi, imagine, online, start, voice, help
+# Load environment variables from .env file
+load_dotenv()
+
+# Set up TELEGRAM credentials
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 
 # Version check
 try:
@@ -32,33 +38,68 @@ logger = logging.getLogger(__name__)
 logger.setLevel(LOGLEVEL)
 
 
+class ApplicationBuilder:
+    def __init__(self, token):
+        self.token = token
+        self.command_handlers = {}
+        self.message_handlers = []
+        self.error_handler = None
+        self._builder = Application.builder().token(self.token)
+
+    def command(self, command):
+        """Register a command handler."""
+        def decorator(func):
+            self.command_handlers[command] = func
+            return func
+        return decorator
+
+    def message(self, filter):
+        """Register a message handler."""
+        def decorator(func):
+            self.message_handlers.append((filter, func))
+            return func
+        return decorator
+
+    def error(self, func):
+        """Register an error handler."""
+        self.error_handler = func
+        return func
+
+    def build(self):
+        application = self._builder.build()
+        for command, handler in self.command_handlers.items():
+            application.add_handler(CommandHandler(command, handler))
+        for filter, handler in self.message_handlers:
+            application.add_handler(MessageHandler(filter, handler))
+        if self.error_handler:
+            application.add_error_handler(self.error_handler)
+        return application
+
+    def load_handlers(self, filename):
+        with open(filename) as f:
+            data = json.load(f)
+
+        for handler in data["handlers"]:
+            module = importlib.import_module(handler["module"])
+            function = getattr(module, handler["function"])
+            if handler["type"] == "command":
+                for command in handler["command"]:
+                    self.command(command)(function)
+            elif handler["type"] == "message":
+                filter = getattr(filters, handler["filter"])
+                self.message(filter)(function)
+
+
+
 def main() -> None:
     """Start the bot."""
+    application_builder = ApplicationBuilder(TELEGRAM_TOKEN)
+
+    # Load handlers from json file
+    application_builder.load_handlers('handlers.json')
 
     # Create the Application and pass it your bot's token.
-    application = Application.builder().token(TELEGRAM_TOKEN).build()
-
-    # Define command mappings
-    commands = {
-        "start": start.handler,
-        "help": help.handler,
-        "hi": hi.handler,
-        "online": online.handler,
-        "ai": ai.handler,
-        "sarah": ai.handler,
-        "imagine": imagine.handler,
-    }
-
-    # Add command handlers
-    for command, handler in commands.items():
-        application.add_handler(CommandHandler(command, handler))
-
-    # Add message handlers
-    # on non command i.e message - echo the message on Telegram
-    # application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo.handler))
-
-    # handling voice messages
-    application.add_handler(MessageHandler(filters.VOICE, voice.handler))
+    application = application_builder.build()
 
     # print sticker details to the console
     # application.add_handler(MessageHandler(filters.Sticker.ALL, print_sticker_details))

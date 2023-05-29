@@ -1,0 +1,40 @@
+{
+    "handlers": [
+        {
+            "type": "command",
+            "command": ["start"],
+            "module": "handlers.start",
+            "function": "handler"
+        },
+        {
+            "type": "command",
+            "command": ["hi", "hello", "hey"],
+            "module": "handlers.hi",
+            "function": "handler"
+        },
+        {
+            "type": "command",
+            "command": ["help"],
+            "module": "handlers.help",
+            "function": "handler"
+        },
+        {
+            "type": "command",
+            "command": ["sarah", "ai"],
+            "module": "handlers.ai",
+            "function": "handler"
+        },
+        {
+            "type": "command",
+            "command": ["imagine"],
+            "module": "handlers.imagine",
+            "function": "handler"
+        },
+        {
+            "type": "message",
+            "filter": "VOICE",
+            "module": "handlers.voice",
+            "function": "handler"
+        }
+    ]
+}
