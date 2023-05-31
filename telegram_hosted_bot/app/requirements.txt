@@ -8,3 +8,4 @@ python-dotenv
 aiohttp
 pydub
 tiktoken
+langchain
