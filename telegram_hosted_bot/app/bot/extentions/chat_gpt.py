@@ -98,7 +98,7 @@ async def get_chat_response_async(user_input: str, conversation_history: Convers
             "user_input must be string and conversation_history must be ConversationSummaryBufferMemory."
         )
 
-    config = OpenAICompletionOptions.CREATIVE_AND_UNPREDICTABLE.value
+    config = OpenAICompletionOptions.DEFAULT.value
 
     llm = ChatOpenAI(
         client=openai.ChatCompletion.create,
