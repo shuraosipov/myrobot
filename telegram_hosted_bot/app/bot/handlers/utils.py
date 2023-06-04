@@ -4,6 +4,16 @@ from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 from datetime import datetime
 import uuid
+from langdetect import detect
+
+def detect_language(message: str) -> str:
+    """
+    Detect the language of a message using the langdetect library.
+    """
+    try:
+        return detect(message)
+    except Exception as e:
+        return "Error: " + str(e)
 
 async def send_thinking_message_async(message) -> Message:
     """Send a "thinking" message to the chat."""
@@ -14,8 +24,20 @@ async def send_thinking_message_async(message) -> Message:
     # Choose a random thinking emoji
     thinking_emoji = random.choice(thinking_emojis)
 
+    # reply to the chat on the same language as user prompt
+    if message.text is not None:
+        language = detect_language(message.text.replace("/sarah ", ""))
+        print("language: ", language)
+    else:
+        language = "en"
+
     # Prepare the text with HTML formatting
-    text = f"<b>On it, one moment...</b> {thinking_emoji}"
+    if language == "en":
+        text = f"<b>On it, one moment...</b> {thinking_emoji}"
+    elif language == "ru":
+        text = f"<b>Думаю...</b> {thinking_emoji}"
+    else:
+        text = f"<b>On it, one moment...</b> {thinking_emoji}"
 
     # Send the thinking message to the chat
     thinking_message = await message.reply_text(
@@ -23,7 +45,6 @@ async def send_thinking_message_async(message) -> Message:
     )
 
     # Return the thinking message object
-    print(type(thinking_message))
     return thinking_message
 
 
