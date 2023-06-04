@@ -6,13 +6,12 @@ async def handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
     # Define the list of available commands
     command_list = [
-        "/start - Start the bot",
-        "/hi - Say hi to the bot",
-        "/online - Check if the bot is online",
-        "/ai or /sarah - Talk to the AI",
-        "/imagine - Generate a random text",
-        "/help - Show this help message",
+        "/hi - Проверить, в сети ли бот",
+        "/sarah - Поговорить с ИИ",
+        "/imagine - Создание изображений из текста",
+        "/help - Показать это сообщение",
     ]
+
 
     # Join the command list into a single string
     command_text = "\n".join(command_list)
@@ -20,5 +19,5 @@ async def handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Send the command list to the user
     await context.bot.send_message(
         chat_id=update.effective_chat.id, 
-        text=f"Available commands:\n{command_text}"
+        text=f"Список команд:\n\n{command_text}"
     )
