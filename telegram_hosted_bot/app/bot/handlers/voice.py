@@ -5,10 +5,13 @@ import uuid
 import logging
 
 # Related third party imports
+import openai
 from pydub import AudioSegment
 from telegram import Update
 from telegram.constants import ChatAction
 from telegram.ext import ContextTypes
+from langchain.memory import ConversationSummaryBufferMemory
+from langchain.chat_models import ChatOpenAI
 
 # Local application/library specific imports
 from extentions.chat_gpt import get_chat_response_async
@@ -40,15 +43,31 @@ async def handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     logger.info(f"Audio transcribed")
 
     # Get the conversation history for this chat
-    conversation_history = context.chat_data.get(update.message.chat_id, deque([], maxlen=15))
+    llm = ChatOpenAI(
+        model="gpt-3.5-turbo", temperature=0.7, client=openai.Completion.create
+    )
+    memory = context.chat_data.get(
+        update.message.chat_id,
+        ConversationSummaryBufferMemory(llm=llm, max_token_limit=1000),
+    )
+
+    # Add the new message to the conversation history
+    memory.chat_memory.add_user_message(transcript)
 
     # Generate a thoughtful response using the conversation history
-    response = await get_chat_response_async(transcript, conversation_history)
+    response = await get_chat_response_async(transcript, memory)
     logger.info(f"Generated response")
     
     # Respond to the user by editing the thinking message
     await thinking_message.edit_text(text=response)
     logger.info("Voice message processed")
+
+    # Add the response to the conversation history
+    memory.chat_memory.add_ai_message(response)
+
+    # Update conversation history in chat_data
+    context.chat_data[update.message.chat_id] = memory
+    logger.info("Memory updated")
 
 
 async def convert_ogg_to_mp3(ogg_file_path) -> str:
