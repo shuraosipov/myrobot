@@ -30,7 +30,7 @@ async def handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
     memory = context.chat_data.get(
         update.message.chat_id,
-        ConversationSummaryBufferMemory(llm=llm, max_token_limit=1000),
+        ConversationSummaryBufferMemory(llm=llm, max_token_limit=800),
     )
 
     # Add the new message to the conversation history
