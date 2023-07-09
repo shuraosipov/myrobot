@@ -102,7 +102,7 @@ async def get_chat_response_async(user_input: str, conversation_history: Convers
 
     llm = ChatOpenAI(
         client=openai.ChatCompletion.create,
-        model="gpt-3.5-turbo",
+        model="gpt-4",
         temperature=config["temperature"],
         max_tokens=config["max_tokens"],
         model_kwargs={
