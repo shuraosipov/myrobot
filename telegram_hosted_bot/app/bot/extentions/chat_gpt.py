@@ -4,8 +4,11 @@ import os
 from enum import Enum  
 
 # Third-party imports
-from dotenv import load_dotenv  
+from dotenv import load_dotenv 
 import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 from langchain.callbacks import get_openai_callback
 from langchain.chat_models import ChatOpenAI
@@ -18,7 +21,6 @@ from langchain.prompts.prompt import PromptTemplate
 load_dotenv()
 
 # Set up OpenAI API credentials
-openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 
 ### Enable logging.
@@ -101,7 +103,6 @@ async def get_chat_response_async(user_input: str, conversation_history: Convers
     config = OpenAICompletionOptions.DEFAULT.value
 
     llm = ChatOpenAI(
-        client=openai.ChatCompletion.create,
         model="gpt-4",
         temperature=config["temperature"],
         max_tokens=config["max_tokens"],
@@ -139,11 +140,13 @@ async def get_chat_response_async(user_input: str, conversation_history: Convers
 
 async def get_image_response(user_input: str) -> str:
     try:
-        response = openai.Image.create(prompt=f"{user_input}", n=1, size="1024x1024")
-        image_url = response["data"][0]["url"]
+        response = client.images.generate(prompt=user_input, n=1, size="1024x1024")
+        # Access the URL using the attribute
+        image_url = response.data[0].url
     except openai.APIError as e:
         # Handle the API error here
         logging.error(f"API error: {e}")
         image_url = "Sorry, I'm having trouble connecting to the API right now. Please try again later."
 
     return image_url
+

@@ -1,5 +1,7 @@
 import logging
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=OPENAI_API_KEY)
 from openai.error import Timeout
 
 from const import OPENAI_API_KEY
@@ -21,17 +23,14 @@ def generate_text(prompt, temperature=0.9, max_tokens=500, timeout_sec=5) -> str
     """
     Generate text using OpenAI GPT-3 API.
     """
-    openai.api_key = OPENAI_API_KEY
     logging.debug(f"Sending message to OpenAI: {prompt}")
 
     try:
-        response = openai.Completion.create(
-            engine="text-davinci-002",
-            prompt=prompt,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            request_timeout=timeout_sec,
-        )
+        response = client.completions.create(engine="text-davinci-002",
+        prompt=prompt,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        request_timeout=timeout_sec)
 
         logging.debug(f"OpenAI response: {response}")
         return response["choices"][0]["text"]

@@ -2,7 +2,9 @@ import os
 from collections import deque
 from dotenv import load_dotenv
 import tiktoken
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 import logging
 
 
@@ -10,7 +12,6 @@ import logging
 load_dotenv()
 
 # Set up OpenAI API credentials
-openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 class Conversation(deque):
     """
@@ -42,13 +43,11 @@ class Conversation(deque):
 
 
     def summarize_text(self, history):
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": 'You are a helpful assistant that summarizes the conversation history to form your long term memory. Summarize the history but keep it under 500 tokens. '},
-                *history,
-            ],
-        )
+        response = client.chat.completions.create(model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": 'You are a helpful assistant that summarizes the conversation history to form your long term memory. Summarize the history but keep it under 500 tokens. '},
+            *history,
+        ])
         return response['choices'][0]['message']['content']
 
     def get_history_for_openai_api(self):

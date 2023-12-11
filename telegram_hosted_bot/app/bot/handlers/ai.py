@@ -1,5 +1,11 @@
+# Standard library imports
+import os  
+
 # Third-party library imports
 import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -26,7 +32,7 @@ async def handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     # Get the conversation history for this chat
     llm = ChatOpenAI(
-        model="gpt-3.5-turbo", temperature=0.7, client=openai.Completion.create
+        model="gpt-3.5-turbo", temperature=0.7
     )
     memory = context.chat_data.get(
         update.message.chat_id,
