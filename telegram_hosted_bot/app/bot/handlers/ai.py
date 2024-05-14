@@ -12,7 +12,7 @@ from telegram.ext import ContextTypes
 from telegram.constants import ChatAction
 
 from langchain.memory import ConversationSummaryBufferMemory
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 
 # Custom module imports
 from handlers.utils import send_thinking_message_async

@@ -1,17 +1,17 @@
 # Standard library imports
-import logging  
-import os  
-from enum import Enum  
+import logging
+import os
+from enum import Enum
 
 # Third-party imports
-from dotenv import load_dotenv 
+from dotenv import load_dotenv
 import openai
 from openai import OpenAI
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 from langchain.callbacks import get_openai_callback
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain.chains import ConversationChain
 from langchain.memory import ConversationSummaryBufferMemory
 from langchain.prompts.prompt import PromptTemplate
@@ -91,11 +91,15 @@ class OpenAICompletionOptions(Enum):
     }
 
 
-async def get_chat_response_async(user_input: str, conversation_history: ConversationSummaryBufferMemory) -> str:
+async def get_chat_response_async(
+    user_input: str, conversation_history: ConversationSummaryBufferMemory
+) -> str:
     """Call the OpenAI API Completion endpoint to get the response synchronously."""
 
     # Input validation
-    if not isinstance(user_input, str) or not isinstance(conversation_history, ConversationSummaryBufferMemory):
+    if not isinstance(user_input, str) or not isinstance(
+        conversation_history, ConversationSummaryBufferMemory
+    ):
         raise ValueError(
             "user_input must be string and conversation_history must be ConversationSummaryBufferMemory."
         )
@@ -103,7 +107,7 @@ async def get_chat_response_async(user_input: str, conversation_history: Convers
     config = OpenAICompletionOptions.DEFAULT.value
 
     llm = ChatOpenAI(
-        model="gpt-4",
+        model="gpt-4o",
         temperature=config["temperature"],
         max_tokens=config["max_tokens"],
         model_kwargs={
@@ -115,16 +119,15 @@ async def get_chat_response_async(user_input: str, conversation_history: Convers
     PROMPT = PromptTemplate(template=template, input_variables=["history", "input"])
 
     conversation = ConversationChain(
-        prompt=PROMPT, 
-        llm=llm, 
-        verbose=True,
-        memory=conversation_history
+        prompt=PROMPT, llm=llm, verbose=True, memory=conversation_history
     )
 
     with get_openai_callback() as cb:
         response = conversation.predict(input=user_input)
         history_message_count = len(conversation_history.buffer)
-        history_token_count = conversation_history.llm.get_num_tokens_from_messages(conversation_history.buffer)
+        history_token_count = conversation_history.llm.get_num_tokens_from_messages(
+            conversation_history.buffer
+        )
 
         logger.info(
             f"Total Tokens: {cb.total_tokens}, "
@@ -149,4 +152,10 @@ async def get_image_response(user_input: str) -> str:
         image_url = "Sorry, I'm having trouble connecting to the API right now. Please try again later."
 
     return image_url
+
+
+# create function tjat convert time 
+def convert_time(time):
+    return time.strftime("%Y-%m-%d %H:%M:%S")
+    # return time.strftime("%Y-%m-%d %H:%M:%S")
 

@@ -10,3 +10,4 @@ pydub
 tiktoken
 langchain
 langdetect
+langchain_openai
