@@ -7,6 +7,8 @@ from aws_cdk import (
     aws_iam as iam,
     aws_secretsmanager as sm,
 )
+
+from aws_cdk.aws_ecr_assets import DockerImageAsset
 from constructs import Construct
 
 
@@ -23,11 +25,21 @@ class TelegramHostedBotStack(Stack):
             vpc=vpc,
         )
 
-        ecr_repository = ecr.Repository.from_repository_name(
-            self, "ECRRepository", "telegram_bot"
+        # Build and push the Docker image from the local ./app folder to ECR
+        docker_image_asset = DockerImageAsset(
+            self,
+            "DockerImage",
+            directory="./app"
         )
 
-        image = ecs.ContainerImage.from_ecr_repository(ecr_repository, tag="latest")
+        image = ecs.ContainerImage.from_docker_image_asset(docker_image_asset)
+
+
+        # ecr_repository = ecr.Repository.from_repository_name(
+        #     self, "ECRRepository", "telegram_bot"
+        # )
+
+        # image = ecs.ContainerImage.from_ecr_repository(ecr_repository, tag="latest")
 
         task_definition = ecs.TaskDefinition(
             self,
@@ -41,11 +53,18 @@ class TelegramHostedBotStack(Stack):
             self, "telegram_token", secret_name="TELEGRAM_TOKEN"
         )
 
+        openai_api_key = sm.Secret.from_secret_name_v2(
+            self, "openai_api_key", secret_name="OPENAI_API_KEY"
+        )
+
         task_definition.add_container(
             "telegram-hosted-bot-container",
             image=image,
             logging=ecs.LogDrivers.aws_logs(stream_prefix="telegram-hosted-bot"),
-            secrets={"TELEGRAM_TOKEN": ecs.Secret.from_secrets_manager(telegram_token)},
+            secrets={
+                "TELEGRAM_TOKEN": ecs.Secret.from_secrets_manager(telegram_token),
+                "OPENAI_API_KEY": ecs.Secret.from_secrets_manager(openai_api_key)
+            },
         )
 
         task_execution_policy = iam.PolicyStatement(
@@ -70,7 +89,7 @@ class TelegramHostedBotStack(Stack):
             self, "DefaultSG", vpc=vpc, security_group_name="default"
         )
 
-        # crate fargate service
+        # create fargate service
         service = ecs.FargateService(
             self,
             "telegram-hosted-bot-service",

@@ -125,16 +125,20 @@ async def get_chat_response_async(
     with get_openai_callback() as cb:
         response = conversation.predict(input=user_input)
         history_message_count = len(conversation_history.buffer)
-        history_token_count = conversation_history.llm.get_num_tokens_from_messages(
-            conversation_history.buffer
-        )
+
+        #print(type(conversation_history))
+        
+        # TO FIX IT - something has changed in api
+        # history_token_count = conversation_history.llm.get_num_tokens_from_messages(
+        #     conversation_history.buffer
+        # )
 
         logger.info(
             f"Total Tokens: {cb.total_tokens}, "
             f"Prompt Tokens: {cb.prompt_tokens}, "
             f"Completion Tokens: {cb.completion_tokens}, "
             f"Total Cost (USD): ${cb.total_cost}, "
-            f"History Token Count: {str(history_token_count)}, "
+            # f"History Token Count: {str(history_token_count)}, "
             f"History Message Count: {history_message_count}"
         )
 

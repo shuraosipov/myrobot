@@ -11,3 +11,4 @@ tiktoken
 langchain
 langdetect
 langchain_openai
+langchain-community
